@@ -33,6 +33,7 @@ type Message {
 
 type Query {
   getUsers: [User]
+  getCurrentUser: User
   getPosts: [Post]
   getMessage: [Message]
 }

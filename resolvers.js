@@ -10,6 +10,16 @@ module.exports = {
     Query: {
         getUsers: () => null,
 
+        getCurrentUser: async (_, args, {User, currentUser}) => {
+            if (!currentUser) {
+                return null;
+            }
+            return User.findOne({username: currentUser.username}).populate({
+                path: 'favorites',
+                model: 'Post'
+            });
+        },
+
         getPosts: async (_, args, {Post}) => {
             return Post.find({})
                 .sort({createdDate: "desc"})
