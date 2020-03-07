@@ -26,12 +26,15 @@
     import {mapGetters} from 'vuex'
     export default {
         name: 'Home',
+
         created() {
             this.handleGetCarouselPosts();
         },
+
         computed: {
             ...mapGetters(['loading', 'posts'])
         },
+
         methods: {
             handleGetCarouselPosts() {
                 // react out to vuex store, fire action that gets posts for carousel
