@@ -1,13 +1,13 @@
 <template>
     <div class="text-center">
-        <!--<v-flex xs12>
-            <v-carousel cycle interval="3000" hide-delimiter-background
+        <v-flex xs12>
+            <v-carousel v-if="posts.length > 0" cycle interval="3000" hide-delimiter-background
                         show-arrows-on-hover>
-                <v-carousel-item v-for="post in getPosts" :key="post._id" :src="post.imageUrl">
+                <v-carousel-item v-for="post in posts" :key="post._id" :src="post.imageUrl">
                     <h1 id="carousel__title">{{ post.title }}</h1>
                 </v-carousel-item>
             </v-carousel>
-        </v-flex>-->
+        </v-flex>
     </div>
 </template>
 
@@ -17,12 +17,17 @@
     export default {
         name: 'Home',
         created() {
-          this.handleGetCarouselPosts();
+            this.handleGetCarouselPosts();
+        },
+        computed: {
+          posts() {
+            return this.$store.getters.posts;
+          }
         },
         methods: {
             handleGetCarouselPosts() {
                 // react out to vuex store, fire action that gets posts for carousel
-              this.$store.dispatch('getPosts');
+                this.$store.dispatch('getPosts');
             }
         }
     }
