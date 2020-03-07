@@ -39,6 +39,8 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         name: "Signin",
         data() {
@@ -47,6 +49,20 @@
                 password: 'password',
             }
         },
+
+        computed: {
+           ...mapGetters(['user'])
+        },
+
+        watch: {
+            user(value) {
+                // user value changes from null to object, redirect to home page
+                if (value) {
+                    this.$router.push('/');
+                }
+            }
+        },
+
         methods: {
             handleSignInUser() {
                 this.$store.dispatch('signInUser', {

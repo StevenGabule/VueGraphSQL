@@ -6,6 +6,7 @@ import Signin from "../components/Auth/Signin";
 import Signup from "../components/Auth/Signup";
 import AddPost from "../components/Posts/AddPost";
 import Profile from "../components/Auth/Profile";
+import AuthGuard from "./AuthGuard";
 
 Vue.use(VueRouter);
 
@@ -21,7 +22,7 @@ const routes = [
     component: Posts
   },
   {
-    path: '/add-post',
+    path: '/post/add',
     name: 'AddPost',
     component: AddPost
   },
@@ -38,7 +39,8 @@ const routes = [
   {
     path: '/profile',
     name: 'Profile',
-    component: Profile
+    component: Profile,
+    beforeEnter: AuthGuard
   },
 ];
 
