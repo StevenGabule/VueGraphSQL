@@ -8,7 +8,7 @@
                     <h1 class="title pl-3">VueShare</h1>
                 </router-link>
             </v-toolbar>
-            <v-divider />
+            <v-divider/>
             <!-- SideNavbar Links -->
             <v-list>
                 <v-subheader>Navigation Links</v-subheader>
@@ -57,7 +57,9 @@
         <!-- App Content -->
         <main>
             <v-container>
-                <router-view/>
+                <transition name="fade">
+                    <router-view/>
+                </transition>
             </v-container>
         </main>
     </v-app>
@@ -69,9 +71,9 @@
         name: 'App',
 
         data() {
-          return {
-              sideNav: false
-          }
+            return {
+                sideNav: false
+            }
         },
 
         computed: {
@@ -93,3 +95,18 @@
 
     };
 </script>
+
+<style>
+    .fade-enter-active,
+    .fade-leave-active {
+        transition-property: opacity;
+        transition-duration: 0.25s;
+    }
+    .fade-enter-active {
+       transition-delay: 0.25s;
+    }
+    .fade-enter,
+    .fade-leave-active{
+        opacity: 0;
+    }
+</style>
