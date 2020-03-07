@@ -1,46 +1,72 @@
-module.exports = {
-  Query: {
-    getUsers: () => null,
-    getPosts: async (_, args, { Post }) => {
-      const posts = await Post.find({})
-        .sort({ createdDate: "desc" })
-        .populate({
-          path: "createdBy",
-          model: "User"
-        });
-      return posts;
-    }
-  },
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-  Mutation: {
-    addPost: async (
-      _,
-      { title, imageUrl, categories, description, creatorId },
-      { Post }
-    ) => {
-      const newPost = await new Post({
-        title,
-        imageUrl,
-        categories,
-        description,
-        createdBy: creatorId
-      }).save();
-      return newPost;
+const createToken = (user, secret, expiresIn) => {
+    const {username, email} = user;
+    return jwt.sign({username, email}, secret, {expiresIn});
+};
+
+module.exports = {
+    Query: {
+        getUsers: () => null,
+
+        getPosts: async (_, args, {Post}) => {
+            return Post.find({})
+                .sort({createdDate: "desc"})
+                .populate({
+                    path: "createdBy",
+                    model: "User"
+                });
+        }
     },
 
-    signUpUser: async (_, { username, email, password }, { User }) => {
-      const user = await User.findOne({ username });
+    Mutation: {
+        addPost: async (
+            _,
+            {title, imageUrl, categories, description, creatorId},
+            {Post}
+        ) => {
+            return await new Post({
+                title,
+                imageUrl,
+                categories,
+                description,
+                createdBy: creatorId
+            }).save();
+        },
 
-      if (user) {
-        throw new Error("User already exists!");
-      }
+        signInUser: async (_, {username, password}, {User}) => {
+            const user = await User.findOne({username});
 
-      const newUser = await new User({
-        username,
-        email,
-        password
-      }).save();
-      return newUser;
+            if (!user) {
+                throw new Error('User not found!');
+            }
+
+            const isValidPassword = await bcrypt.compare(password, user.password);
+
+            if (!isValidPassword) {
+                throw new Error('Invalid password');
+            }
+
+            return {token: createToken(user, process.env.SECRET, '1hr')};
+
+        },
+
+        signUpUser: async (_, {username, email, password}, {User}) => {
+            const user = await User.findOne({username});
+
+            if (user) {
+                throw new Error("User already exists!");
+            }
+
+            const newUser = await new User({
+                username,
+                email,
+                password
+            }).save();
+
+            return {token: createToken(newUser, process.env.SECRET, '1hr')};
+
+        }
     }
-  }
 };
