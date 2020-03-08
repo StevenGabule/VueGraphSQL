@@ -10,6 +10,8 @@ export default new Vuex.Store({
     state: {
         posts: [],
         user: null,
+        error: null,
+        authError: null,
         loading: false
     },
     mutations: {
@@ -22,7 +24,14 @@ export default new Vuex.Store({
         setUser: (state,payload) => {
             state.user = payload;
         },
-        clearUser: state => (state.user = null)
+        setError: (state, payload) => {
+            state.error = payload;
+        },
+        setAuthError: (state, payload) => {
+            state.authError = payload;
+        },
+        clearUser: state => (state.user = null),
+        clearError: state => (state.error = null),
     },
     actions: {
         getCurrentUser: ({commit}) => {
@@ -56,25 +65,39 @@ export default new Vuex.Store({
         },
 
         signInUser: ({commit}, payload) => {
-            localStorage.setItem("token", "");
+            commit("clearError");
+            commit('setLoading', true);
             apolloClient.mutate({
                 mutation: SIGNIN_USER,
                 variables: payload
             }).then(({data}) => {
-                console.log(data.signInUser);
                 localStorage.setItem("token", data.signInUser.token);
-                // to make sure created method is run in main.js (we run getCurrentUser) reload the page
+                commit('setLoading', false);
                 router.go();
             }).catch(err => {
-                console.error(err)
+                console.error(err);
+                commit('setError', err);
+                commit('setLoading', false);
             })
         },
 
         signUpUser: ({commit}, payload) => {
+            commit("clearError");
+            commit('setLoading', true);
             apolloClient.mutate({
-                mutation: SIGNUP_USER
+                mutation: SIGNUP_USER,
+                variables: payload
+            }).then(({data}) => {
+                localStorage.setItem("token", data.signUpUser.token);
+                commit('setLoading', false);
+                router.go();
+            }).catch(err => {
+                console.error(err);
+                commit('setError', err);
+                commit('setLoading', false);
             })
         },
+
         signOutUser: async ({commit}) => {
             // clear user in state
             commit('clearUser');
@@ -92,6 +115,8 @@ export default new Vuex.Store({
     getters: {
         posts: state => state.posts,
         loading: state => state.loading,
+        error: state => state.error,
+        authError: state => state.authError,
         user: state => state.user
     },
     modules: {}
