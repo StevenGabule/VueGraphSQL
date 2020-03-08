@@ -1,15 +1,64 @@
 <template>
-    <div>
-        <h1>Posts</h1>
+  <v-container text-xs-center v-if="infiniteScrollPosts">
+    <div v-for="post in infiniteScrollPosts.posts" :key="post._id">
+      <img :src="post.imageUrl" alt="" height="100px" />
+      <h3>{{ post.title }}</h3>
     </div>
+    <v-btn @click="showMore" v-if="showMoreEnabled">Load more</v-btn>
+  </v-container>
 </template>
 
 <script>
-    export default {
-        name: "Posts"
+import { INFINITE_SCROLL_POSTS } from "../../store/queries";
+
+const pageSize = 2;
+
+export default {
+  name: "Posts",
+  data() {
+    return {
+      pageNum: 1,
+      showMoreEnabled: true
+    };
+  },
+
+  apollo: {
+    infiniteScrollPosts: {
+      query: INFINITE_SCROLL_POSTS,
+      variables: {
+        pageNum: 1,
+        pageSize
+      }
     }
+  },
+  methods: {
+    showMore() {
+      // fetch more data and transform original result
+      this.pageNum += 1;
+      this.$apollo.queries.infiniteScrollPosts.fetchMore({
+        variables: {
+          // pageNum incremented by 1
+          pageNum: this.pageNum,
+          pageSize
+        },
+
+        updateQuery: (prevResult, { fetchMoreResult }) => {
+          const newPosts = fetchMoreResult.infiniteScrollPosts.posts;
+          const hasMore = fetchMoreResult.infiniteScrollPosts.hasMore;
+          this.showMoreEnabled = hasMore;
+
+          return {
+            infiniteScrollPosts: {
+              __typename: prevResult.infiniteScrollPosts.__typename,
+              posts: [...prevResult.infiniteScrollPosts.posts, ...newPosts],
+              hasMore
+            }
+          };
+        }
+      });
+    }
+  }
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

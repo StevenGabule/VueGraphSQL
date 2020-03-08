@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router/index';
 import {defaultClient as apolloClient} from '../main'
-import {GET_CURRENT_USER, GET_POSTS, SIGNIN_USER, SIGNUP_USER} from "./queries";
+import {ADD_POST, GET_CURRENT_USER, GET_POSTS, SIGNIN_USER, SIGNUP_USER} from "./queries";
 
 Vue.use(Vuex);
 
@@ -101,15 +101,37 @@ export default new Vuex.Store({
         signOutUser: async ({commit}) => {
             // clear user in state
             commit('clearUser');
-
             // remove the token in localstorage
             localStorage.removeItem("token", "");
-
             // end the session
             await apolloClient.resetStore();
-
             await router.push("/signin");
+        },
 
+        addPost: ({commit}, payload) => {
+            apolloClient.mutate({
+                mutation: ADD_POST,
+                variables: payload,
+                update: (cache, {data: { addPost }}) => {
+                    const data = cache.readQuery({query: GET_POSTS});
+                    data.getPosts.unshift(addPost);
+                    cache.writeQuery({
+                        query: GET_POSTS,
+                        data
+                    });
+                },
+                // optimistic response ensures data is added immediately as we specified for update function
+                optimisticResponse: {
+                    __typename: 'Mutation',
+                    addPost: {
+                        __typename: "Post",
+                        _id: -1,
+                        ...payload
+                    }
+                }
+            }).then(({data}) => {
+                console.log(data.addPost)
+            }).catch(err => console.error(err))
         }
     },
     getters: {

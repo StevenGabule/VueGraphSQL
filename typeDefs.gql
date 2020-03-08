@@ -31,11 +31,15 @@ type Message {
   messageUser: User!
 }
 
+type PostsPage {
+  posts: [Post]
+  hasMore: Boolean
+}
+
 type Query {
-  getUsers: [User]
   getCurrentUser: User
   getPosts: [Post]
-  getMessage: [Message]
+  infiniteScrollPosts(pageNum: Int!, pageSize: Int!): PostsPage
 }
 
 type Mutation {
