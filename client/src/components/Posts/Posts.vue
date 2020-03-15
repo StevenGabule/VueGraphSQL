@@ -5,9 +5,9 @@
 
             <v-flex xs12 sm6 v-for="post in infiniteScrollPosts.posts" :key="post._id">
 
-                <v-card hover class="mx-auto" @click.native="goToPost(post._id)">
+                <v-card hover class="mx-auto">
 
-                    <v-img :src="post.imageUrl" height="30vh" lazy class="white--text align-end">
+                    <v-img @click.native="goToPost(post._id)" :src="post.imageUrl" height="30vh" lazy class="white--text align-end">
                         <v-card-title class="black--text" v-text="post.title"/>
                     </v-img>
 
@@ -30,20 +30,24 @@
                     <v-slide-y-transition v-if="showPostCreator">
                         <v-card-text class="grey lighten-4">
                             <v-list-item>
+
                                 <v-list-item-avatar>
                                     <img :src="post.createdBy.avatar" alt="">
                                 </v-list-item-avatar>
+
                                 <v-list-item-content>
                                     <v-list-item-title class="text--primary">{{ post.createdBy.username }}
                                     </v-list-item-title>
                                     <v-list-item-subtitle class="font-weight-thin">Added {{ post.createdDate }}
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
+
                                 <v-list-item-action>
                                     <v-btn icon>
                                         <v-icon color="grey lighten-1">mdi-info</v-icon>
                                     </v-btn>
                                 </v-list-item-action>
+
                             </v-list-item>
                         </v-card-text>
                     </v-slide-y-transition>
