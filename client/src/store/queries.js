@@ -76,27 +76,27 @@ export const ADD_POST = gql`
 `;
 
 export const GET_POST = gql`
-    query($postId: ID!) {
-        getPost(postId: $postId) {
-            _id
-            title
-            imageUrl
-            categories
-            description
-            likes
-            createdDate
-            messages {
-                _id
-                messageBody
-                messageDate
-                messageUser {
-                    _id
-                    username
-                    avatar
-                }
-            }
+  query($postId: ID!) {
+    getPost(postId: $postId) {
+      _id
+      title
+      imageUrl
+      categories
+      description
+      likes
+      createdDate
+      messages {
+        _id
+        messageBody
+        messageDate
+        messageUser {
+          _id
+          username
+          avatar
         }
+      }
     }
+  }
 `;
 
 export const INFINITE_SCROLL_POSTS = gql`
@@ -119,6 +119,25 @@ export const INFINITE_SCROLL_POSTS = gql`
           username
           avatar
         }
+      }
+    }
+  }
+`;
+
+export const ADD_POST_MESSAGE = gql`
+  mutation($messageBody: String!, $userId: ID!, $postId: ID!) {
+    addPostMessage(
+      messageBody: $messageBody
+      userId: $userId
+      postId: $postId
+    ) {
+      _id
+      messageBody
+      messageDate
+      messageUser {
+        _id
+        username
+        avatar
       }
     }
   }
