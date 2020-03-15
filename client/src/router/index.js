@@ -7,6 +7,7 @@ import Signup from "../components/Auth/Signup";
 import AddPost from "../components/Posts/AddPost";
 import Profile from "../components/Auth/Profile";
 import AuthGuard from "./AuthGuard";
+import Post from "../components/Posts/Post";
 
 Vue.use(VueRouter);
 
@@ -20,6 +21,12 @@ const routes = [
     path: '/posts',
     name: 'Posts',
     component: Posts
+  },
+  {
+    path: '/posts/:postId',
+    name: 'Post',
+    component: Post,
+    props: true
   },
   {
     path: '/post/add',

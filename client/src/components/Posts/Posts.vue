@@ -5,7 +5,7 @@
 
             <v-flex xs12 sm6 v-for="post in infiniteScrollPosts.posts" :key="post._id">
 
-                <v-card hover class="mx-auto">
+                <v-card hover class="mx-auto" @click.native="goToPost(post._id)">
 
                     <v-img :src="post.imageUrl" height="30vh" lazy class="white--text align-end">
                         <v-card-title class="black--text" v-text="post.title"/>
@@ -114,6 +114,10 @@
                         };
                     }
                 });
+            },
+
+            goToPost(postId) {
+                this.$router.push(`/posts/${postId}`);
             }
         }
     };
