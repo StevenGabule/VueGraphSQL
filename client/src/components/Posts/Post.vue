@@ -7,8 +7,8 @@
 
                         <h1>{{getPost.title}}</h1>
 
-                        <v-btn @click="handleUnLikePost" large icon v-if="user">
-                            <v-icon large color="grey">mdi-heart</v-icon>
+                        <v-btn @click="handleTogglePost" large icon v-if="user">
+                            <v-icon large :color="checkIfPostLiked(getPost._id) ? 'red': 'grey'">mdi-heart</v-icon>
                         </v-btn>
 
                         <h3 class="ml-3 font-weight-thin">{{ getPost.likes}} Likes</h3>
@@ -107,7 +107,8 @@
                 messageRules: [
                     message => !!message || 'Message is required.',
                     message => message.length < 50 || 'Message must be less than 50 characters'
-                ]
+                ],
+                postLiked: false
             }
         },
         apollo: {
@@ -121,7 +122,7 @@
             }
         },
         computed: {
-            ...mapGetters(['user']),
+            ...mapGetters(['user', 'userFavorites']),
         },
         methods: {
             gotoPreviousPage() {
@@ -217,6 +218,22 @@
                     const updateUser = {...this.user, favorites: data.unlikePost.favorites};
                     this.$store.commit('setUser', updateUser);
                 }).catch(err => console.error(err));
+            },
+            handleTogglePost() {
+                if (this.postLiked) {
+                    this.handleUnLikePost();
+                } else {
+                    this.handleLikePost();
+                }
+            },
+            checkIfPostLiked(postId) {
+                if (this.userFavorites && this.userFavorites.some(fave => fave._id === postId)) {
+                    this.postLiked = true;
+                    return true;
+                } else {
+                    this.postLiked = false;
+                    return false;
+                }
             }
         }
     };
