@@ -67,8 +67,8 @@
                     <!-- PROFILE BUTTON -->
                     <v-btn text to="/profile" v-if="user">
                         <v-icon class="hidden-sm-only" left>mdi-account-box</v-icon>
-                        <v-badge right color="red darken-2">
-                            <span slot="badge">12</span>
+                        <v-badge right color="red darken-2" :class="{ 'bounce': badgeAnimated }">
+                            <span slot="badge" v-if="userFavorites.length > 0">{{ userFavorites.length}}</span>
                             Profile
                         </v-badge>
                     </v-btn>
@@ -118,7 +118,8 @@
             return {
                 sideNav: false,
                 authErrorSnackBar: false,
-                authSnackBar: true
+                authSnackBar: true,
+                badgeAnimated: false
             }
         },
 
@@ -141,11 +142,18 @@
                 if (value !== null) {
                     this.authErrorSnackBar = true;
                 }
+            },
+            userFavorites(value) {
+                // if user favorites value changed at all
+                if (value) {
+                    this.badgeAnimated =  true;
+                    setTimeout(() => (this.badgeAnimated = false), 1000);
+                }
             }
         },
 
         computed: {
-            ...mapGetters(['user', 'authError']),
+            ...mapGetters(['user', 'authError', 'userFavorites']),
 
             horizontalNavItems() {
                 let items = [
@@ -194,5 +202,24 @@
     .fade-enter,
     .fade-leave-active {
         opacity: 0;
+    }
+
+    .bounce {
+        animation: bounce 1s both;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0, 0, 0);
+        }
+        40%, 43% {
+            transform: translate3d(0, -20px, 0);
+        }
+        70% {
+            transform: translate3d(0, -10px, 0);
+        }
+        90% {
+            transform: translate3d(0, -4px, 0);
+        }
     }
 </style>
