@@ -109,21 +109,53 @@ module.exports = {
 
       return { token: createToken(newUser, process.env.SECRET, "1hr") };
     },
+
     addPostMessage: async (_, { messageBody, userId, postId }, { Post }) => {
       const newMessage = {
         messageBody,
         messageUser: userId
       };
       const post = await Post.findOneAndUpdate(
-          { _id: postId },
-          { $push: { messages: { $each: [newMessage], $position: 0 } } },
-          { new: true }
+        { _id: postId },
+        { $push: { messages: { $each: [newMessage], $position: 0 } } },
+        { new: true }
       ).populate({
         path: "messages.messageUser",
         model: "User"
       });
       return post.messages[0];
+    },
+    likePost: async (_, { postId, username }, { Post, User }) => {
+      const post = await Post.findOneAndUpdate(
+        { _id: postId },
+        { $inc: { likes: 1 } },
+        { new: true }
+      );
+      const user = await User.findOneAndUpdate(
+        { username },
+        { $addToSet: { favorites: postId } },
+        { new: true }
+      ).populate({
+        path: "favorites",
+        model: "Post"
+      });
+      return { likes: post.likes, favorites: user.favorites };
+    },
+    unlikePost: async (_, { postId, username }, { Post, User }) => {
+      const post = await Post.findOneAndUpdate(
+        { _id: postId },
+        { $inc: { likes: -1 } },
+        { new: true }
+      );
+      const user = await User.findOneAndUpdate(
+        { username },
+        { $pull: { favorites: postId } },
+        { new: true }
+      ).populate({
+        path: "favorites",
+        model: "Post"
+      });
+      return { likes: post.likes, favorites: user.favorites };
     }
-  },
-
+  }
 };

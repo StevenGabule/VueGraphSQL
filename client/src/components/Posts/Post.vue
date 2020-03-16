@@ -7,7 +7,7 @@
 
                         <h1>{{getPost.title}}</h1>
 
-                        <v-btn large icon v-if="user">
+                        <v-btn @click="handleUnLikePost" large icon v-if="user">
                             <v-icon large color="grey">mdi-heart</v-icon>
                         </v-btn>
 
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-    import {ADD_POST_MESSAGE, GET_POST} from "../../store/queries";
+    import {ADD_POST_MESSAGE, GET_POST, LIKE_POST, UNLIKE_POST} from "../../store/queries";
     import {mapGetters} from "vuex";
 
     export default {
@@ -165,6 +165,58 @@
             },
             checkIfOwnMessage(message) {
                 return this.user && this.user._id === message.messageUser._id
+            },
+            handleLikePost() {
+                const variables = {
+                    postId: this.postId,
+                    username: this.user.username
+                };
+
+                this.$apollo.mutate({
+                    mutation: LIKE_POST,
+                    variables,
+                    update: (cache, {data: {likePost}}) => {
+                        const data = cache.readQuery({
+                            query: GET_POST,
+                            variables: { postId: this.postId}
+                        });
+                        data.getPost.likes +=1;
+                        cache.writeQuery({
+                            query: GET_POST,
+                            variables: { postId: this.postId},
+                            data
+                        });
+                    }
+                }).then(({data}) => {
+                  const updateUser = {...this.user, favorites: data.likePost.favorites};
+                  this.$store.commit('setUser', updateUser);
+                }).catch(err => console.error(err));
+            },
+            handleUnLikePost() {
+                const variables = {
+                    postId: this.postId,
+                    username: this.user.username
+                };
+
+                this.$apollo.mutate({
+                    mutation: UNLIKE_POST,
+                    variables,
+                    update: (cache, {data: {unlikePost}}) => {
+                        const data = cache.readQuery({
+                            query: GET_POST,
+                            variables: { postId: this.postId}
+                        });
+                        data.getPost.likes -=1;
+                        cache.writeQuery({
+                            query: GET_POST,
+                            variables: { postId: this.postId},
+                            data
+                        });
+                    }
+                }).then(({data}) => {
+                    const updateUser = {...this.user, favorites: data.unlikePost.favorites};
+                    this.$store.commit('setUser', updateUser);
+                }).catch(err => console.error(err));
             }
         }
     };

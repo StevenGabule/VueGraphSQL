@@ -17,10 +17,12 @@ const User = require("./models/User");
 const Post = require("./models/Post");
 
 // connect to mlab database
+mongoose.set('useCreateIndex', true);
 mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: true
     })
     .then(() => console.log("DB connected"))
     .catch(errors => console.error(errors));
