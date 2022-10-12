@@ -12,7 +12,7 @@
   "author": "John Paul Lim gabule",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^2.11.0",
+    "apollo-server": "^2.25.4",
     "bcrypt": "^3.0.0",
     "dotenv": "^6.0.0",
     "graphql": "^14.6.0",
